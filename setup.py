@@ -15,6 +15,14 @@ def main():
         url='https://github.com/czchen/khinsider-dl.git',
         description='KHInsider Downloader',
         long_description=long_description,
+        packages = [
+            'khinsiderdl'
+        ],
+        entry_points={
+            'console_scripts': [
+                'khinsider-dl = khinsiderdl.console:main',
+            ],
+        },
         classifiers=[
             'Development Status :: 1 - Planning',
             'Environment :: Console',
