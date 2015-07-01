@@ -21,11 +21,15 @@
 
 
 import os
+
 from distutils.core import setup
+from pip.req import parse_requirements
 
 def main():
     with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as f:
         long_description = f.read()
+
+    install_reqs = parse_requirements(os.path.join(os.path.dirname(__file__), 'requirements.txt'))
 
     setup(
         name='khinsider-dl',
@@ -38,6 +42,7 @@ def main():
         packages = [
             'khinsiderdl'
         ],
+        install_reqs=install_reqs,
         entry_points={
             'console_scripts': [
                 'khinsider-dl = khinsiderdl.console:main',
@@ -49,7 +54,7 @@ def main():
             'License :: OST Approved :: MIT License',
             'Operating System :: OS Independent',
             'Programming Language :: Python :: 3 :: Only',
-            'Programming Language :: Python :: 3.3',
+            'Programming Language :: Python :: 3.4',
         ]
     )
 
