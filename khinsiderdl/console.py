@@ -20,6 +20,8 @@
 # THE SOFTWARE.
 
 import argparse
+import os
+
 
 def get_args():
     parser = argparse.ArgumentParser(
@@ -43,5 +45,7 @@ def get_args():
 
 def main():
     args = get_args()
+
+    os.makedirs(args.output[0], exist_ok=True)
 
     return 0
