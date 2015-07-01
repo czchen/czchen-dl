@@ -1,1 +1,5 @@
 *.pyc
+.ropeproject
+.tox
+/MANIFEST
+/venv
