@@ -21,8 +21,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-import asyncio
 import argparse
+import asyncio
+import http.client
 import logging
 import os
 
@@ -58,7 +59,7 @@ def download_single_album(*, loop, output_dir, album_url):
 
         rsp = yield from aiohttp.request('GET', album_url)
 
-        if rsp.status != 200:
+        if rsp.status != http.client.OK:
             logging.warning('Cannot GET {album_url}, status is {status}'.format(
                 album_url=album_url,
                 status=rsp.status))
