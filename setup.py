@@ -25,6 +25,7 @@ import os
 from distutils.core import setup
 from pip.req import parse_requirements
 
+
 def main():
     with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as f:
         long_description = f.read()
@@ -39,7 +40,7 @@ def main():
         url='https://github.com/czchen/khinsider-dl.git',
         description='KHInsider Downloader',
         long_description=long_description,
-        packages = [
+        packages=[
             'khinsiderdl'
         ],
         install_reqs=install_reqs,

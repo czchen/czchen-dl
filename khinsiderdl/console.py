@@ -29,19 +29,20 @@ def get_args():
     )
 
     parser.add_argument('url',
-        metavar='url',
-        type=str,
-        nargs='+',
-        help='URL to download')
+                        metavar='url',
+                        type=str,
+                        nargs='+',
+                        help='URL to download')
 
     parser.add_argument('--output', '-o',
-        metavar='output',
-        default='output',
-        type=str,
-        nargs=1,
-        help='Output directory')
+                        metavar='output',
+                        default='output',
+                        type=str,
+                        nargs=1,
+                        help='Output directory')
 
     return parser.parse_args()
+
 
 def main():
     args = get_args()
