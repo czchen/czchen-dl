@@ -21,6 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import asyncio
 import argparse
 import os
 
@@ -46,9 +47,18 @@ def get_args():
     return parser.parse_args()
 
 
-def main():
+@asyncio.coroutine
+def run():
     args = get_args()
 
-    os.makedirs(args.output[0], exist_ok=True)
+    output_dir = args.output[0]
+
+    os.makedirs(output_dir, exist_ok=True)
+
+
+def main():
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(run())
+    loop.close()
 
     return 0
