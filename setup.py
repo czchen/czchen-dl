@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# coding=UTF-8
+#
 # Copyright (c) 2015 ChangZhuo Chen (陳昌倬) <czchen@gmail.com>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
