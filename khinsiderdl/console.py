@@ -52,15 +52,21 @@ def get_args():
 
 @asyncio.coroutine
 def download_single_album(*, loop, output_dir, album_url):
-    album_name = album_url[album_url.rfind('/') + 1:]
-    album_dir = os.path.join(output_dir, album_url)
+    try:
+        album_name = album_url[album_url.rfind('/') + 1:]
+        album_dir = os.path.join(output_dir, album_url)
 
-    rsp = yield from aiohttp.request('GET', album_url)
+        rsp = yield from aiohttp.request('GET', album_url)
 
-    if rsp.status != 200:
-        logging.warning('Cannot GET {album_url}, status is {status}'.format(
-            album_url=album_url,
-            status=rsp.status))
+        if rsp.status != 200:
+            logging.warning('Cannot GET {album_url}, status is {status}'.format(
+                album_url=album_url,
+                status=rsp.status))
+            return
+
+    except Exception:
+        logging.exception('Cannot retrive information from {album_url}'.format(
+            album_url=album_url))
         return
 
     os.makedirs(album_dir, exist_ok=True)
