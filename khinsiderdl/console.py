@@ -48,17 +48,29 @@ def get_args():
 
 
 @asyncio.coroutine
-def run():
+def download_single_album(*, loop, album_url):
+    print(album_url)
+
+
+@asyncio.coroutine
+def run(loop):
     args = get_args()
 
     output_dir = args.output[0]
 
     os.makedirs(output_dir, exist_ok=True)
 
+    coroutines = []
+
+    for url in args.url:
+        coroutines.append(download_single_album(loop=loop, album_url=url))
+
+    asyncio.gather(*coroutines, loop=loop, return_exceptions=True)
+
 
 def main():
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(run())
+    loop.run_until_complete(run(loop))
     loop.close()
 
     return 0
