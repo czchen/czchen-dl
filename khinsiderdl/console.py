@@ -23,7 +23,10 @@
 
 import asyncio
 import argparse
+import logging
 import os
+
+import aiohttp
 
 
 def get_args():
@@ -48,8 +51,19 @@ def get_args():
 
 
 @asyncio.coroutine
-def download_single_album(*, loop, album_url):
-    print(album_url)
+def download_single_album(*, loop, output_dir, album_url):
+    album_name = album_url[album_url.rfind('/') + 1:]
+    album_dir = os.path.join(output_dir, album_url)
+
+    rsp = yield from aiohttp.request('GET', album_url)
+
+    if rsp.status != 200:
+        logging.warning('Cannot GET {album_url}, status is {status}'.format(
+            album_url=album_url,
+            status=rsp.status))
+        return
+
+    os.makedirs(album_dir, exist_ok=True)
 
 
 @asyncio.coroutine
@@ -59,11 +73,14 @@ def run(loop):
     output_dir = args.output[0]
 
     os.makedirs(output_dir, exist_ok=True)
+    logging.debug('output_dir is {}'.format(output_dir))
 
     coroutines = []
 
     for url in args.url:
-        coroutines.append(download_single_album(loop=loop, album_url=url))
+        coroutines.append(download_single_album(loop=loop,
+                                                output_dir=output_dir,
+                                                album_url=url))
 
     asyncio.gather(*coroutines, loop=loop, return_exceptions=True)
 
