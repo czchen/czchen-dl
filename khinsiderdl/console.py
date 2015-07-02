@@ -38,7 +38,7 @@ def get_args():
 
     parser.add_argument('--output', '-o',
                         metavar='output',
-                        default='output',
+                        default=['output'],
                         type=str,
                         nargs=1,
                         help='Output directory')
