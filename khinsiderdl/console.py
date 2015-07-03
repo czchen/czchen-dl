@@ -26,6 +26,7 @@ import asyncio
 import http.client
 import logging
 import os
+import re
 
 import aiohttp
 
@@ -52,7 +53,7 @@ def get_args():
 
 
 @asyncio.coroutine
-def download_single_album(*, loop, output_dir, album_url):
+def download_single_album(*, output_dir, album_url):
     try:
         album_name = album_url[album_url.rfind('/') + 1:]
         album_dir = os.path.join(output_dir, album_url)
@@ -65,6 +66,8 @@ def download_single_album(*, loop, output_dir, album_url):
                 status=rsp.status))
             return
 
+        body = yield from rsp.read()
+
     except Exception:
         logging.exception('Cannot retrive information from {album_url}'.format(
             album_url=album_url))
@@ -74,7 +77,7 @@ def download_single_album(*, loop, output_dir, album_url):
 
 
 @asyncio.coroutine
-def run(loop):
+def run():
     args = get_args()
 
     output_dir = args.output[0]
@@ -82,19 +85,22 @@ def run(loop):
     os.makedirs(output_dir, exist_ok=True)
     logging.debug('output_dir is {}'.format(output_dir))
 
-    coroutines = []
+    tasks = []
 
     for url in args.url:
-        coroutines.append(download_single_album(loop=loop,
-                                                output_dir=output_dir,
-                                                album_url=url))
+        task = asyncio.ensure_future(
+            download_single_album(output_dir=output_dir,
+                                  album_url=url))
 
-    asyncio.gather(*coroutines, loop=loop, return_exceptions=True)
+        tasks.append(task)
+
+    # FIXME: Block until all tasks finish
+    ret = asyncio.wait(tasks)
 
 
 def main():
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(run(loop))
-    loop.close()
+    loop.run_until_complete(run())
+    loop.run_forever()
 
     return 0
