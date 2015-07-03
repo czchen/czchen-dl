@@ -94,13 +94,12 @@ def run():
 
         tasks.append(task)
 
-    # FIXME: Block until all tasks finish
-    ret = asyncio.wait(tasks)
+    yield from asyncio.wait(tasks)
 
 
 def main():
     loop = asyncio.get_event_loop()
     loop.run_until_complete(run())
-    loop.run_forever()
+    loop.close()
 
     return 0
