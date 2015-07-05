@@ -54,7 +54,43 @@ def get_args():
 
 @asyncio.coroutine
 def download_single_song(*, output_dir, song_url):
-    print('song_url = ' + song_url)
+    try:
+        rsp = yield from aiohttp.request('GET', song_url)
+        if rsp.status != http.client.OK:
+            logging.warning('Cannot GET {song_url}, status is {status}'.format(
+                song_url=song_url,
+                status=rsp.status))
+            return
+
+        body = yield from rsp.read()
+
+    except Exception:
+        logging.exception('Cannot retrive song information from {song_url}'.format(
+            song_url=song_url))
+        return
+
+    match = re.search('href="(?P<song>.*\.mp3)"', body.decode('UTF-8'))
+    if match is None:
+        logging.warning('Cannot find download link in {song_url}'.format(
+            song_url=song_url))
+        return
+
+    song = match.group('song')
+
+    try:
+        rsp = yield from aiohttp.request('GET', song)
+        if rsp.status != http.client.OK:
+            logging.warning('Cannot GET {song}, status is {status}'.format(
+                song=song,
+                status=rsp.status))
+            return
+
+        body = yield from rsp.read()
+
+    except Exception:
+        logging.exception('Cannot retrive song from {song}'.format(
+            song=song))
+        return
 
 
 @asyncio.coroutine
@@ -74,7 +110,7 @@ def download_single_album(*, output_dir, album_url):
         body = yield from rsp.read()
 
     except Exception:
-        logging.exception('Cannot retrive information from {album_url}'.format(
+        logging.exception('Cannot retrive album information from {album_url}'.format(
             album_url=album_url))
         return
 
@@ -106,7 +142,6 @@ def run():
         task = asyncio.ensure_future(
             download_single_album(output_dir=output_dir,
                                   album_url=url))
-
         tasks.append(task)
 
     yield from asyncio.wait(tasks)
