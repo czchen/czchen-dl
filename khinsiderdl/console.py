@@ -53,6 +53,31 @@ def get_args():
 
 
 @asyncio.coroutine
+def find_all_match_in_page(*, url, pattern):
+    logging.debug('Find pattern {pattern} in {url}'.format(
+        url=url, pattern=pattern))
+
+    try:
+        rsp = yield from aiohttp.request('GET', url)
+        if rsp.status != http.client.OK:
+            logging.warning('Cannot GET {url} for pattern {pattern}, status is {status}'.format(
+                url=url,
+                pattern=pattern,
+                status=rsp.status))
+            return iter([])
+
+        body = (yield from rsp.read()).decode('UTF-8')
+
+    except Exception:
+        logging.exception('Cannot GET {url} for pattern {pattern}'.format(
+            url=url,
+            pattern=pattern))
+        return iter([])
+
+    re.findall(pattern, body)
+
+
+@asyncio.coroutine
 def download_single_song(*, output_dir, song_url):
     try:
         rsp = yield from aiohttp.request('GET', song_url)
