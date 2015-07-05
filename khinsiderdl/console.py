@@ -53,6 +53,11 @@ def get_args():
 
 
 @asyncio.coroutine
+def download_single_song(*, output_dir, song_url):
+    print('song_url = ' + song_url)
+
+
+@asyncio.coroutine
 def download_single_album(*, output_dir, album_url):
     try:
         album_name = album_url[album_url.rfind('/') + 1:]
@@ -74,6 +79,16 @@ def download_single_album(*, output_dir, album_url):
         return
 
     os.makedirs(album_dir, exist_ok=True)
+
+    tasks = []
+
+    for url in set(re.findall('href="(.*\.mp3)"', body.decode('UTF-8'))):
+        task = asyncio.ensure_future(
+            download_single_song(output_dir=album_dir,
+                                 song_url=url))
+        tasks.append(task)
+
+    yield from asyncio.wait(tasks)
 
 
 @asyncio.coroutine
