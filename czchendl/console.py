@@ -29,6 +29,7 @@ import os
 import re
 
 import aiohttp
+import yaml
 
 
 def get_args():
@@ -48,6 +49,12 @@ def get_args():
                         type=str,
                         nargs=1,
                         help='Output directory')
+
+    parser.add_argument('--config', '-c',
+                        metavar='config',
+                        type=str,
+                        nargs='?',
+                        help='configuration')
 
     return parser.parse_args()
 
@@ -163,9 +170,20 @@ def download_single_album(*, output_dir, album_url, semaphore):
     yield from asyncio.wait(tasks)
 
 
+def get_config(args):
+    config = {}
+
+    if args.config:
+        with open(args.config, 'r') as f:
+            config.update(yaml.load(f.read()))
+
+    return config
+
 @asyncio.coroutine
 def run():
     args = get_args()
+    config = get_config(args)
+    print(config)
     semaphore = asyncio.Semaphore(5)
 
     output_dir = args.output[0]
