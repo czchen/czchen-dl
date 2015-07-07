@@ -35,20 +35,20 @@ def main():
     install_reqs = parse_requirements(os.path.join(os.path.dirname(__file__), 'requirements.txt'))
 
     setup(
-        name='khinsider-dl',
+        name='czchen-dl',
         version='0.0.0',
         author='ChangZhuo Chen (陳昌倬)',
         author_email='czchen@gmail.com',
-        url='https://github.com/czchen/khinsider-dl.git',
-        description='KHInsider Downloader',
+        url='https://github.com/czchen/czchen-dl.git',
+        description='czchen downloader',
         long_description=long_description,
         packages=[
-            'khinsiderdl'
+            'czchendl'
         ],
         install_reqs=install_reqs,
         entry_points={
             'console_scripts': [
-                'khinsider-dl = khinsiderdl.console:main',
+                'czchen-dl = czchendl.console:main',
             ],
         },
         classifiers=[

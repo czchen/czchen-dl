@@ -1,7 +1,7 @@
-.. image:: http://img.shields.io/travis/czchen/khinsider-dl.svg?style=flat
-   :target: https://travis-ci.org/czchen/khinsider-dl
+.. image:: http://img.shields.io/travis/czchen/czchen-dl.svg?style=flat
+   :target: https://travis-ci.org/czchen/czchen-dl
 
-khinsider-dl
+czchen-dl
 ============
 
-`KHInsider <http://downloads.khinsider.com/>`_ Downloader.
+Various downloader for czchen.
