@@ -25,6 +25,7 @@ import argparse
 import asyncio
 import http.client
 import logging
+import logging.config
 import os
 import re
 
@@ -179,12 +180,14 @@ def get_config(args):
 
     return config
 
+
 @asyncio.coroutine
 def run():
     args = get_args()
     config = get_config(args)
-    print(config)
-    semaphore = asyncio.Semaphore(5)
+    logging.config.dictConfig(config['logging'])
+
+    semaphore = asyncio.Semaphore(config['general']['maximum_concurrent_download'])
 
     output_dir = args.output[0]
 
