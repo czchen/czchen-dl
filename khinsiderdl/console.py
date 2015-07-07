@@ -129,7 +129,7 @@ def download_single_song(*, output_dir, song_url):
 def download_single_album(*, output_dir, album_url):
     try:
         album_name = album_url[album_url.rfind('/') + 1:]
-        album_dir = os.path.join(output_dir, album_url)
+        album_dir = os.path.join(output_dir, album_name)
 
         rsp = yield from aiohttp.request('GET', album_url)
 
