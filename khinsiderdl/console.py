@@ -112,6 +112,13 @@ def download_single_song(*, output_dir, song_url):
 
         body = yield from rsp.read()
 
+        song_name = os.path.join(output_dir, song.split('/')[-1])
+
+        with open(song_name, 'wb') as f:
+            logging.debug('song_name = {song_name}'.format(
+                song_name=song_name))
+            f.write(body)
+
     except Exception:
         logging.exception('Cannot retrive song from {song}'.format(
             song=song))
