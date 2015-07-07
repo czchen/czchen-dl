@@ -137,31 +137,17 @@ def download_single_song(*, output_dir, song_url, semaphore):
 
 @asyncio.coroutine
 def download_single_album(*, output_dir, album_url, semaphore):
-    try:
-        album_name = album_url[album_url.rfind('/') + 1:]
-        album_dir = os.path.join(output_dir, album_name)
+    logging.debug('download_single_album, output_dir = {output_dir}, album_url = {album_url}'.format(
+        output_dir=output_dir,
+        album_url=album_url))
 
-        with (yield from semaphore):
-            rsp = yield from aiohttp.request('GET', album_url)
+    album_name = album_url.split('/')[-1]
 
-        if rsp.status != http.client.OK:
-            logging.warning('Cannot GET {album_url}, status is {status}'.format(
-                album_url=album_url,
-                status=rsp.status))
-            return
-
-        body = yield from rsp.read()
-
-    except Exception:
-        logging.exception('Cannot retrive album information from {album_url}'.format(
-            album_url=album_url))
-        return
-
+    album_dir = os.path.join(output_dir, album_name)
     os.makedirs(album_dir, exist_ok=True)
 
     tasks = []
-
-    for url in set(re.findall('href="(.*\.mp3)"', body.decode('UTF-8'))):
+    for url in set(find_all_match_in_page(album_url, 'href="(.*\.mp3)"')):
         task = asyncio.ensure_future(
             download_single_song(output_dir=album_dir,
                                  song_url=url,
