@@ -78,9 +78,10 @@ def find_all_match_in_page(*, url, pattern):
 
 
 @asyncio.coroutine
-def download_single_song(*, output_dir, song_url):
+def download_single_song(*, output_dir, song_url, semaphore):
     try:
-        rsp = yield from aiohttp.request('GET', song_url)
+        with (yield from semaphore):
+            rsp = yield from aiohttp.request('GET', song_url)
         if rsp.status != http.client.OK:
             logging.warning('Cannot GET {song_url}, status is {status}'.format(
                 song_url=song_url,
@@ -103,7 +104,8 @@ def download_single_song(*, output_dir, song_url):
     song = match.group('song')
 
     try:
-        rsp = yield from aiohttp.request('GET', song)
+        with (yield from semaphore):
+            rsp = yield from aiohttp.request('GET', song)
         if rsp.status != http.client.OK:
             logging.warning('Cannot GET {song}, status is {status}'.format(
                 song=song,
@@ -126,12 +128,13 @@ def download_single_song(*, output_dir, song_url):
 
 
 @asyncio.coroutine
-def download_single_album(*, output_dir, album_url):
+def download_single_album(*, output_dir, album_url, semaphore):
     try:
         album_name = album_url[album_url.rfind('/') + 1:]
         album_dir = os.path.join(output_dir, album_name)
 
-        rsp = yield from aiohttp.request('GET', album_url)
+        with (yield from semaphore):
+            rsp = yield from aiohttp.request('GET', album_url)
 
         if rsp.status != http.client.OK:
             logging.warning('Cannot GET {album_url}, status is {status}'.format(
@@ -153,7 +156,8 @@ def download_single_album(*, output_dir, album_url):
     for url in set(re.findall('href="(.*\.mp3)"', body.decode('UTF-8'))):
         task = asyncio.ensure_future(
             download_single_song(output_dir=album_dir,
-                                 song_url=url))
+                                 song_url=url,
+                                 semaphore=semaphore))
         tasks.append(task)
 
     yield from asyncio.wait(tasks)
@@ -162,6 +166,7 @@ def download_single_album(*, output_dir, album_url):
 @asyncio.coroutine
 def run():
     args = get_args()
+    semaphore = asyncio.Semaphore(5)
 
     output_dir = args.output[0]
 
@@ -173,7 +178,8 @@ def run():
     for url in args.url:
         task = asyncio.ensure_future(
             download_single_album(output_dir=output_dir,
-                                  album_url=url))
+                                  album_url=url,
+                                  semaphore=semaphore))
         tasks.append(task)
 
     yield from asyncio.wait(tasks)
