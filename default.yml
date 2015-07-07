@@ -1,0 +1,19 @@
+logging:
+    version: 1
+    disable_existing_loggers: True
+
+    formatters:
+        standard:
+            format: '%(asctime)s - %(levelname)s - %(module)s:%(lineno)d - %(funcName)s - %(message)s'
+
+    handlers:
+        console:
+            level: DEBUG
+            class: logging.StreamHandler
+            formatter: standard
+            stream: ext://sys.stdout
+
+    loggers:
+        '':
+            level: INFO
+            handlers: [console]
