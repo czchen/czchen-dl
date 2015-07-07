@@ -82,7 +82,7 @@ def find_all_match_in_page(*, url, pattern):
             pattern=pattern))
         return iter([])
 
-    re.findall(pattern, body)
+    return re.findall(pattern, body)
 
 
 @asyncio.coroutine
@@ -137,7 +137,7 @@ def download_single_song(*, output_dir, song_url, semaphore):
 
 @asyncio.coroutine
 def download_single_album(*, output_dir, album_url, semaphore):
-    logging.debug('download_single_album, output_dir = {output_dir}, album_url = {album_url}'.format(
+    logging.debug('output_dir = {output_dir}, album_url = {album_url}'.format(
         output_dir=output_dir,
         album_url=album_url))
 
@@ -146,8 +146,10 @@ def download_single_album(*, output_dir, album_url, semaphore):
     album_dir = os.path.join(output_dir, album_name)
     os.makedirs(album_dir, exist_ok=True)
 
+    urls = yield from find_all_match_in_page(url=album_url, pattern='href="(.*\.mp3)"')
+
     tasks = []
-    for url in set(find_all_match_in_page(album_url, 'href="(.*\.mp3)"')):
+    for url in set(urls):
         task = asyncio.ensure_future(
             download_single_song(output_dir=album_dir,
                                  song_url=url,
@@ -178,7 +180,7 @@ def run():
     output_dir = args.output[0]
 
     os.makedirs(output_dir, exist_ok=True)
-    logging.debug('output_dir is {}'.format(output_dir))
+    logging.debug('output_dir = {}'.format(output_dir))
 
     tasks = []
 
