@@ -1,1 +1,2 @@
+PyYAML==3.11
 aiohttp==0.16.5
